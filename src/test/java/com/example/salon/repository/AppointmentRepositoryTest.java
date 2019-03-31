@@ -127,4 +127,26 @@ public class AppointmentRepositoryTest {
         Assertions.assertThat(savedPurchase.getPrice()).isEqualTo(purchasePrice);
         Assertions.assertThat(savedPurchase.getLoyaltyPoints()).isEqualTo(purchaseLoyaltyPoints);
     }
+
+
+    @Test
+    public void given_Appointment_then_findByClientId(){
+        Date startTime = new Date();
+        Date endTime = new Date();
+
+        String treatmentName = "Full Head Colour";
+        double treatmentPrice = 85;
+        long treatmentLoyaltyPoints = 20;
+
+        Treatment treatment = new Treatment(treatmentName, treatmentPrice, treatmentLoyaltyPoints);
+
+        Appointment appointment = new Appointment(client, startTime, endTime, Arrays.asList(treatment));
+
+        appointmentRepository.save(appointment);
+
+
+        boolean exists = appointmentRepository.existsByClient_Id(client.getId());
+
+        Assertions.assertThat(exists).isTrue();
+    }
 }

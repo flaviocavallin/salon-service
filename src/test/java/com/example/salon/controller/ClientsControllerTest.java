@@ -2,6 +2,7 @@ package com.example.salon.controller;
 
 import com.example.salon.SalonApplication;
 import com.example.salon.dto.ClientDTO;
+import com.example.salon.exceptions.EntityCascadeDeletionNotAllowedException;
 import com.example.salon.exceptions.EntityNotFoundException;
 import com.example.salon.service.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -106,6 +108,41 @@ public class ClientsControllerTest {
                 .andExpect(status().isNotFound()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.status", is(HttpStatus.NOT_FOUND.name())))
                 .andExpect(jsonPath("$.message", is(errorMessage)));
+
+        Mockito.verify(clientService).getById(clientId);
+    }
+
+    @Test
+    public void given_ClientId_then_deleteClientById() throws Exception {
+        String clientId = "123";
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        Mockito.doNothing().when(clientService).deleteById(captor.capture());
+
+        mvc.perform(delete("/api/v1/clients/{clientId}", clientId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(captor.getValue()).isEqualTo(clientId);
+
+        Mockito.verify(clientService).deleteById(clientId);
+    }
+
+    @Test
+    public void given_ClientId_then_tryDeleteClientById_And_ThrowException_BecauseHasReferenceToAppointment() throws Exception {
+        String clientId = "123";
+
+        String errorMessage = "Impossible to delete the client because there are appointments";
+        Mockito.doThrow(new EntityCascadeDeletionNotAllowedException(errorMessage)).when(clientService).deleteById(clientId);
+
+        mvc.perform(delete("/api/v1/clients/{clientId}", clientId).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.name())))
+                .andExpect(jsonPath("$.message", is(errorMessage)));
+
+        Mockito.verify(clientService).deleteById(clientId);
     }
 
 }

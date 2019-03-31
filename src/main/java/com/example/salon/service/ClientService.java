@@ -7,4 +7,6 @@ public interface ClientService {
     void create(ClientDTO clientDTO);
 
     ClientDTO getById(String clientId);
+
+    void deleteById(String clientId);
 }

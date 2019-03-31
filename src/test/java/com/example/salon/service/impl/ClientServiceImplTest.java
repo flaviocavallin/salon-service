@@ -2,8 +2,10 @@ package com.example.salon.service.impl;
 
 import com.example.salon.domain.Client;
 import com.example.salon.dto.ClientDTO;
+import com.example.salon.exceptions.EntityCascadeDeletionNotAllowedException;
 import com.example.salon.exceptions.EntityNotFoundException;
 import com.example.salon.factory.ClientDTOFactory;
+import com.example.salon.repository.AppointmentRepository;
 import com.example.salon.repository.ClientRepository;
 import com.example.salon.service.ClientService;
 import com.example.salon.util.IntegrationTest;
@@ -33,13 +35,14 @@ public class ClientServiceImplTest extends IntegrationTest {
     private ClientService clientService;
 
     private ClientRepository clientRepository = Mockito.mock(ClientRepository.class);
+    private AppointmentRepository appointmentRepository = Mockito.mock(AppointmentRepository.class);
 
     @Autowired
     private ClientDTOFactory clientDTOFactory;
 
     @Before
     public void setUp() {
-        this.clientService = new ClientServiceImpl(clientRepository, clientDTOFactory);
+        this.clientService = new ClientServiceImpl(clientRepository, clientDTOFactory, appointmentRepository);
     }
 
     @Test
@@ -96,5 +99,38 @@ public class ClientServiceImplTest extends IntegrationTest {
         this.clientService.getById(clientId);
 
         Mockito.verify(clientRepository).findById(clientId);
+    }
+
+
+    @Test
+    public void givenClientId_then_DeleteClienteById() {
+        String clientId = "123";
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        Mockito.doNothing().when(clientRepository).deleteById(captor.capture());
+        Mockito.when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.FALSE);
+
+        this.clientService.deleteById(clientId);
+
+        Assertions.assertThat(captor.getValue()).isEqualTo(clientId);
+
+        Mockito.verify(clientRepository).deleteById(clientId);
+        Mockito.verify(appointmentRepository).existsByClient_Id(clientId);
+    }
+
+
+    @Test
+    public void given_ClientId_then_tryToDeleteTheClient_And_ThrowExceptionBecuaseItHasAReferenceToAppointment(){
+        String clientId = "123";
+
+        thrown.expect(EntityCascadeDeletionNotAllowedException.class);
+        thrown.expectMessage("Impossible to delete the client because there are appointments");
+
+        Mockito.when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.TRUE);
+
+        this.clientService.deleteById(clientId);
+
+        Mockito.verify(appointmentRepository).existsByClient_Id(clientId);
     }
 }

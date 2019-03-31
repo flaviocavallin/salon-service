@@ -1,5 +1,6 @@
 package com.example.salon.exceptions.handler;
 
+import com.example.salon.exceptions.EntityCascadeDeletionNotAllowedException;
 import com.example.salon.exceptions.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,5 +31,15 @@ class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.debug("Exception handled={}", apiError);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
+    @ExceptionHandler({EntityCascadeDeletionNotAllowedException.class})
+    public ResponseEntity<ApiError> notAllowed(EntityCascadeDeletionNotAllowedException ex) {
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, new Date(), ex.getMessage());
+
+        LOGGER.debug("Exception handled={}", apiError);
+
+        return ResponseEntity.badRequest().body(apiError);
     }
 }
