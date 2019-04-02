@@ -1,26 +1,35 @@
 package com.example.salon.service.impl;
 
 import com.example.salon.domain.Client;
+import com.example.salon.domain.PointedClient;
 import com.example.salon.dto.ClientDTO;
+import com.example.salon.dto.PointedClientDTO;
 import com.example.salon.exceptions.EntityCascadeDeletionNotAllowedException;
 import com.example.salon.exceptions.EntityNotFoundException;
 import com.example.salon.factory.ClientDTOFactory;
+import com.example.salon.listeners.LoyaltyPointEvent;
 import com.example.salon.repository.AppointmentRepository;
 import com.example.salon.repository.ClientRepository;
 import com.example.salon.service.ClientService;
-import com.example.salon.util.IntegrationTest;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-public class ClientServiceImplTest extends IntegrationTest {
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class ClientServiceImplTest {
 
     private static final String FIRST_NAME = "name1";
     private static final String LAST_NAME = "lastName1";
@@ -34,11 +43,10 @@ public class ClientServiceImplTest extends IntegrationTest {
 
     private ClientService clientService;
 
-    private ClientRepository clientRepository = Mockito.mock(ClientRepository.class);
-    private AppointmentRepository appointmentRepository = Mockito.mock(AppointmentRepository.class);
+    private ClientRepository clientRepository = mock(ClientRepository.class);
+    private AppointmentRepository appointmentRepository = mock(AppointmentRepository.class);
 
-    @Autowired
-    private ClientDTOFactory clientDTOFactory;
+    private ClientDTOFactory clientDTOFactory = new ClientDTOFactory();
 
     @Before
     public void setUp() {
@@ -52,7 +60,7 @@ public class ClientServiceImplTest extends IntegrationTest {
 
         ArgumentCaptor<Client> captor = ArgumentCaptor.forClass(Client.class);
 
-        Mockito.when(clientRepository.save(captor.capture())).thenReturn(Mockito.any(Client.class));
+        when(clientRepository.save(captor.capture())).thenReturn(any(Client.class));
 
         this.clientService.create(clientDTO);
 
@@ -63,7 +71,7 @@ public class ClientServiceImplTest extends IntegrationTest {
         Assertions.assertThat(client.getPhone()).isEqualTo(PHONE);
         Assertions.assertThat(client.getGender()).isEqualTo(GENDER);
 
-        Mockito.verify(clientRepository).save(client);
+        verify(clientRepository).save(client);
     }
 
 
@@ -73,7 +81,7 @@ public class ClientServiceImplTest extends IntegrationTest {
 
         Client client = new Client(FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER);
 
-        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
         ClientDTO clientDTO = this.clientService.getById(clientId);
 
@@ -83,7 +91,7 @@ public class ClientServiceImplTest extends IntegrationTest {
         Assertions.assertThat(clientDTO.getPhone()).isEqualTo(PHONE);
         Assertions.assertThat(clientDTO.getGender()).isEqualTo(GENDER);
 
-        Mockito.verify(clientRepository).findById(clientId);
+        verify(clientRepository).findById(clientId);
     }
 
 
@@ -91,14 +99,14 @@ public class ClientServiceImplTest extends IntegrationTest {
     public void givenClientId_then_findClient_then_ThrowExceptionBecauseClientNotFound() {
         String clientId = "123";
         String exceptionMessage = "ClientId not found";
-        Mockito.when(clientRepository.findById(clientId)).thenThrow(new EntityNotFoundException(exceptionMessage));
+        when(clientRepository.findById(clientId)).thenThrow(new EntityNotFoundException(exceptionMessage));
 
         thrown.expect(EntityNotFoundException.class);
         thrown.expectMessage(exceptionMessage);
 
         this.clientService.getById(clientId);
 
-        Mockito.verify(clientRepository).findById(clientId);
+        verify(clientRepository).findById(clientId);
     }
 
 
@@ -108,29 +116,83 @@ public class ClientServiceImplTest extends IntegrationTest {
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.doNothing().when(clientRepository).deleteById(captor.capture());
-        Mockito.when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.FALSE);
+        doNothing().when(clientRepository).deleteById(captor.capture());
+        when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.FALSE);
 
         this.clientService.deleteById(clientId);
 
         Assertions.assertThat(captor.getValue()).isEqualTo(clientId);
 
-        Mockito.verify(clientRepository).deleteById(clientId);
-        Mockito.verify(appointmentRepository).existsByClient_Id(clientId);
+        verify(clientRepository).deleteById(clientId);
+        verify(appointmentRepository).existsByClient_Id(clientId);
     }
 
 
     @Test
-    public void given_ClientId_then_tryToDeleteTheClient_And_ThrowExceptionBecuaseItHasAReferenceToAppointment(){
+    public void given_ClientId_then_tryToDeleteTheClient_And_ThrowExceptionBecauseItHasAReferenceToAppointment() {
         String clientId = "123";
 
         thrown.expect(EntityCascadeDeletionNotAllowedException.class);
         thrown.expectMessage("Impossible to delete the client because there are appointments");
 
-        Mockito.when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.TRUE);
+        when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.TRUE);
 
         this.clientService.deleteById(clientId);
 
-        Mockito.verify(appointmentRepository).existsByClient_Id(clientId);
+        verify(appointmentRepository).existsByClient_Id(clientId);
+    }
+
+
+    @Test
+    public void give_LoyalClients_then_return_PointedClientDTO() {
+        String id = "123";
+        String email = "a1@a1.com";
+        long points = 100;
+
+        PointedClient pointedClient = new PointedClient(id, email, points);
+
+        LocalDate dateFrom = LocalDate.of(2019, 1, 2);
+        LocalDate dateTo = LocalDate.of(2019, 1, 3);
+        int limit = 10;
+
+
+        when(clientRepository.getTopMostLoyalActiveClientsBy(dateFrom, dateTo, limit)).thenReturn(Arrays.asList(pointedClient));
+
+        List<PointedClientDTO> pointedClientsDTO = clientService.getTopMostLoyalActiveClientsBy(dateFrom, dateTo,
+                limit);
+
+        Assertions.assertThat(pointedClientsDTO.size()).isEqualTo(1);
+
+        PointedClientDTO dto = pointedClientsDTO.get(0);
+
+        Assertions.assertThat(dto.getId()).isEqualTo(id);
+        Assertions.assertThat(dto.getEmail()).isEqualTo(email);
+        Assertions.assertThat(dto.getPoints()).isEqualTo(points);
+    }
+
+
+    @Test
+    public void given_LoyaltyPointEvent_then_call_incrementLoyaltyPoints() {
+        String clientId = "123";
+        LocalDate date = LocalDate.of(2019, 1, 1);
+        long points = 10;
+
+        LoyaltyPointEvent loyaltyPointEvent = new LoyaltyPointEvent(clientId, date, points);
+        this.clientService.incrementClientLoyaltyPoints(loyaltyPointEvent);
+
+        verify(clientRepository).incrementLoyaltyPoints(clientId, date, points);
+    }
+
+
+    @Test
+    public void given_LoyaltyPointEvent_then_call_decrementLoyaltyPoints() {
+        String clientId = "123";
+        LocalDate date = LocalDate.of(2019, 1, 1);
+        long points = 10;
+
+        LoyaltyPointEvent loyaltyPointEvent = new LoyaltyPointEvent(clientId, date, points);
+        this.clientService.decrementClientLoyaltyPoints(loyaltyPointEvent);
+
+        verify(clientRepository).incrementLoyaltyPoints(clientId, date, -points);
     }
 }

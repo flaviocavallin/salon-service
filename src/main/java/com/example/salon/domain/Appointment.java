@@ -45,6 +45,10 @@ public class Appointment extends AbstractDocument<String> {
         return id;
     }
 
+    protected void setId(String appointmentId){
+        this.id = appointmentId;
+    }
+
     public Client getClient() {
         return client;
     }
@@ -60,6 +64,11 @@ public class Appointment extends AbstractDocument<String> {
     public void addPurchase(Purchase purchase) {
         Objects.requireNonNull(purchase, "purchase can not be null");
         purchases.add(purchase);
+    }
+
+    public void addAllPurchases(List<Purchase> purchases){
+        Objects.requireNonNull(purchases, "purchases can not be null");
+        this.purchases.addAll(purchases);
     }
 
     public List<Purchase> getPurchases() {

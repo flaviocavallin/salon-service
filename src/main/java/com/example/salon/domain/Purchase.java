@@ -1,19 +1,12 @@
 package com.example.salon.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.bson.types.ObjectId;
 
 import java.util.Objects;
 
-//@Document(collection = "purchases")
-//@TypeAlias("purchase")
-public class Purchase { // extends AbstractDocument<String> {
-//
-//    @Id
-//    private String id;
+public class Purchase extends AbstractDocument<String> {
 
-//    private Appointment appointment;
+    private String id;
     private String name;
     private double price;
     private long loyaltyPoints;
@@ -23,24 +16,19 @@ public class Purchase { // extends AbstractDocument<String> {
         //do nothing
     }
 
-//    public Purchase(Appointment appointment, String name, double price, long loyaltyPoints) {
-public Purchase(String name, double price, long loyaltyPoints) {
+    public Purchase(String name, double price, long loyaltyPoints) {
         this();
-//        this.appointment = Objects.requireNonNull(appointment, "appointment can not be null");
+        this.id = ObjectId.get().toString();
         this.name = Objects.requireNonNull(name, "name can not be null");
         this.price = price;
         this.loyaltyPoints = loyaltyPoints;
     }
 
 
-//    @Override
-//    public String getId() {
-//        return id;
-//    }
-//
-//    public Appointment getAppointment() {
-//        return appointment;
-//    }
+    @Override
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -53,4 +41,5 @@ public Purchase(String name, double price, long loyaltyPoints) {
     public long getLoyaltyPoints() {
         return loyaltyPoints;
     }
+
 }

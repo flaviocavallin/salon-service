@@ -9,7 +9,7 @@ import java.util.Objects;
 @Component
 public class ClientDTOFactory {
 
-    ClientDTOFactory() {
+    public ClientDTOFactory() {
         //do nothing
     }
 

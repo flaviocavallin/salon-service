@@ -2,6 +2,7 @@ package com.example.salon.controller;
 
 import com.example.salon.SalonApplication;
 import com.example.salon.dto.ClientDTO;
+import com.example.salon.dto.PointedClientDTO;
 import com.example.salon.exceptions.EntityCascadeDeletionNotAllowedException;
 import com.example.salon.exceptions.EntityNotFoundException;
 import com.example.salon.service.ClientService;
@@ -20,6 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -34,6 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = SalonApplication.class)
 @AutoConfigureMockMvc
 public class ClientsControllerTest {
+
+    private static final String CLIENT_ID = "123";
 
     private static final String FIRST_NAME = "name1";
     private static final String LAST_NAME = "lastName1";
@@ -50,6 +56,7 @@ public class ClientsControllerTest {
 
     @Test
     public void createTest() throws Exception {
+
         ClientDTO dto = new ClientDTO(FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER);
 
         String content = objectMapper.writeValueAsString(dto);
@@ -77,13 +84,12 @@ public class ClientsControllerTest {
 
     @Test
     public void getByIdTest() throws Exception {
-        String clientId = "123";
 
         ClientDTO clientDTO = new ClientDTO(FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER);
 
-        given(clientService.getById(clientId)).willReturn(clientDTO);
+        given(clientService.getById(CLIENT_ID)).willReturn(clientDTO);
 
-        mvc.perform(get("/api/v1/clients/{clientId}", clientId)
+        mvc.perform(get("/api/v1/clients/{clientId}", CLIENT_ID)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -94,55 +100,77 @@ public class ClientsControllerTest {
                 .andExpect(jsonPath("$.gender", is(GENDER)))
                 .andDo(print());
 
-        Mockito.verify(clientService).getById(clientId);
+        Mockito.verify(clientService).getById(CLIENT_ID);
     }
 
     @Test
     public void given_ClientId_then_ClientNotFound_And_HandleException() throws Exception {
-        String clientId = "123";
 
         String errorMessage = "ClientId not found";
-        given(clientService.getById(clientId)).willThrow(new EntityNotFoundException(errorMessage));
+        given(clientService.getById(CLIENT_ID)).willThrow(new EntityNotFoundException(errorMessage));
 
-        mvc.perform(get("/api/v1/clients/{clientId}", clientId).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
+        mvc.perform(get("/api/v1/clients/{clientId}", CLIENT_ID).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.status", is(HttpStatus.NOT_FOUND.name())))
                 .andExpect(jsonPath("$.message", is(errorMessage)));
 
-        Mockito.verify(clientService).getById(clientId);
+        Mockito.verify(clientService).getById(CLIENT_ID);
     }
 
     @Test
     public void given_ClientId_then_deleteClientById() throws Exception {
-        String clientId = "123";
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
         Mockito.doNothing().when(clientService).deleteById(captor.capture());
 
-        mvc.perform(delete("/api/v1/clients/{clientId}", clientId)
+        mvc.perform(delete("/api/v1/clients/{clientId}", CLIENT_ID)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        Assertions.assertThat(captor.getValue()).isEqualTo(clientId);
+        Assertions.assertThat(captor.getValue()).isEqualTo(CLIENT_ID);
 
-        Mockito.verify(clientService).deleteById(clientId);
+        Mockito.verify(clientService).deleteById(CLIENT_ID);
     }
 
     @Test
     public void given_ClientId_then_tryDeleteClientById_And_ThrowException_BecauseHasReferenceToAppointment() throws Exception {
-        String clientId = "123";
 
         String errorMessage = "Impossible to delete the client because there are appointments";
-        Mockito.doThrow(new EntityCascadeDeletionNotAllowedException(errorMessage)).when(clientService).deleteById(clientId);
+        Mockito.doThrow(new EntityCascadeDeletionNotAllowedException(errorMessage)).when(clientService).deleteById(CLIENT_ID);
 
-        mvc.perform(delete("/api/v1/clients/{clientId}", clientId).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
+        mvc.perform(delete("/api/v1/clients/{clientId}", CLIENT_ID).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.name())))
                 .andExpect(jsonPath("$.message", is(errorMessage)));
 
-        Mockito.verify(clientService).deleteById(clientId);
+        Mockito.verify(clientService).deleteById(CLIENT_ID);
+    }
+
+
+    @Test
+    public void given_limit_and_dateFrom_then_getTopLoyalClients() throws Exception {
+
+        int limit = 10;
+        LocalDate dateFrom = LocalDate.of(2019, 1, 1);
+
+        String id = "1";
+        String email = "a1@a1.com";
+        Long points = 10l;
+
+        PointedClientDTO dto = new PointedClientDTO(id, email, points);
+
+        given(clientService.getTopMostLoyalActiveClientsBy(dateFrom, LocalDate.now(), limit)).willReturn(Arrays.asList(dto));
+
+        mvc.perform(get("/api/v1/clients/top/{limit}/loyal", limit).param("dateFrom", dateFrom.toString()).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$[0].id", is(id)))
+                .andExpect(jsonPath("$[0].email", is(email)))
+                .andExpect(jsonPath("$[0].points", is(points.intValue())))
+                .andDo(print());
+
+        Mockito.verify(clientService).getTopMostLoyalActiveClientsBy(dateFrom, LocalDate.now(), limit);
     }
 
 }

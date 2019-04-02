@@ -5,7 +5,6 @@ import com.example.salon.domain.Client;
 import com.example.salon.domain.Purchase;
 import com.example.salon.domain.Treatment;
 import com.example.salon.dto.AppointmentDTO;
-import com.example.salon.dto.PurchaseDTO;
 import com.example.salon.exceptions.EntityNotFoundException;
 import com.example.salon.repository.AppointmentRepository;
 import com.example.salon.repository.ClientRepository;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,23 +48,27 @@ class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = new Appointment(client, appointmentDTO.getStartTime(), appointmentDTO.getEndTime(),
                 treatments);
 
+        if (CollectionUtils.isNotEmpty(appointmentDTO.getPurchases())) {
+            List<Purchase> purchases = appointmentDTO.getPurchases().stream().map(t -> new Purchase(t.getName(),
+                    t.getPrice(),
+                    t.getLoyaltyPoints())).collect(Collectors.toList());
+            appointment.addAllPurchases(purchases);
+        }
+
         appointmentRepository.save(appointment);
     }
 
     @Override
-    public void addPurchase(String appointmentId, PurchaseDTO purchaseDTO) {
+    public void deleteById(String appointmentId) {
         Objects.requireNonNull(appointmentId, "appointmentId can not be null");
-        Objects.requireNonNull(purchaseDTO, "purchaseDTO can not be null");
 
-        Appointment appointment =
-                appointmentRepository.findById(appointmentId).orElseThrow(() -> new EntityNotFoundException("The " +
-                        "appointment does not exists"));
+        appointmentRepository.deleteById(appointmentId);
+    }
 
-        Purchase purchase = new Purchase(purchaseDTO.getName(), purchaseDTO.getPrice(),
-                purchaseDTO.getLoyaltyPoints());
+    @Override
+    public Optional<Appointment> findById(String appointmentId) {
+        Objects.requireNonNull(appointmentId, "appointmentId can not be null");
 
-        appointment.addPurchase(purchase);
-
-        appointmentRepository.save(appointment);
+        return appointmentRepository.findById(appointmentId);
     }
 }

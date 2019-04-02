@@ -1,9 +1,9 @@
 package com.example.salon.controller;
 
 import com.example.salon.dto.AppointmentDTO;
-import com.example.salon.dto.PurchaseDTO;
 import com.example.salon.service.AppointmentService;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,13 +24,14 @@ public class AppointmentsController {
 
     @PostMapping
     //TODO Add validations
+    //TODO return appointment
     public void create(@RequestBody AppointmentDTO appointmentDTO) {
         this.appointmentService.create(appointmentDTO);
     }
 
-    @PostMapping("/{appointmentId}/purchase")
-    public void purchase(@PathVariable("appointmentId") String appointmentId, @RequestBody PurchaseDTO purchaseDTO) {
-        this.appointmentService.addPurchase(appointmentId, purchaseDTO);
 
+    @DeleteMapping(value = "/{appointmentId}")
+    public void delete(@PathVariable("appointmentId") String appointmentId) {
+        this.appointmentService.deleteById(appointmentId);
     }
 }

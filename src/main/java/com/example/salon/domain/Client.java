@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 @Document(collection = "clients")
@@ -18,6 +20,8 @@ public class Client extends AbstractDocument<String> {
     private String phone;
     private String gender;
     private boolean banned;
+
+    private List<LoyaltyPoint> loyaltyPoints = new LinkedList<>();
 
     Client() {
         //do nothing
@@ -67,5 +71,19 @@ public class Client extends AbstractDocument<String> {
 
     public boolean isBanned() {
         return banned;
+    }
+
+    public void setBanned(boolean banned) {
+        this.banned = banned;
+    }
+
+    public void addLoyaltyPoints(LoyaltyPoint loyaltyPoint) {
+        Objects.requireNonNull(loyaltyPoint, "loyaltyPoint can not be null");
+
+        this.loyaltyPoints.add(loyaltyPoint);
+    }
+
+    public List<LoyaltyPoint> getLoyaltyPoints() {
+        return loyaltyPoints;
     }
 }

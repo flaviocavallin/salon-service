@@ -8,6 +8,8 @@ import java.util.Objects;
 
 public class AppointmentDTO {
 
+    private String appointmentId;
+
     private String clientId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss Z")
@@ -17,6 +19,8 @@ public class AppointmentDTO {
     private Date endTime;
 
     private List<TreatmentDTO> treatments;
+
+    private List<PurchaseDTO> purchases;
 
     AppointmentDTO() {
         //do nothing
@@ -43,5 +47,21 @@ public class AppointmentDTO {
 
     public List<TreatmentDTO> getTreatments() {
         return treatments;
+    }
+
+    public List<PurchaseDTO> getPurchases() {
+        return purchases;
+    }
+
+    public void setPurchases(List<PurchaseDTO> purchases) {
+        this.purchases = purchases;
+    }
+
+    public String getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(String appointmentId) {
+        this.appointmentId = appointmentId;
     }
 }
