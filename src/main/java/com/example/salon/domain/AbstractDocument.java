@@ -1,13 +1,15 @@
 package com.example.salon.domain;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.io.Serializable;
-
 abstract class AbstractDocument<ID extends Serializable> implements Serializable {
 
-    public abstract ID getId();
+	private static final long serialVersionUID = 7092057815446474816L;
+
+	public abstract ID getId();
 
     @Override
     public String toString() {

@@ -14,10 +14,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 public class AppointmentServiceImplTest {
 
-    private static final String CLIENT_ID = "123";
+    private static final UUID CLIENT_ID = UUID.randomUUID();
     private static final String FIRST_NAME = "name1";
     private static final String LAST_NAME = "lastName1";
     private static final String EMAIL = "a1@a1.com";
@@ -38,10 +40,12 @@ public class AppointmentServiceImplTest {
     private AppointmentService appointmentService;
     private AppointmentRepository appointmentRepository = mock(AppointmentRepository.class);
     private ClientRepository clientRepository = mock(ClientRepository.class);
+    private ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
 
     @Before
     public void setUp() {
-        appointmentService = new AppointmentServiceImpl(appointmentRepository, clientRepository);
+        appointmentService = new AppointmentServiceImpl(appointmentRepository, clientRepository,
+                applicationEventPublisher);
     }
 
     @Test
@@ -66,7 +70,7 @@ public class AppointmentServiceImplTest {
 
         AppointmentDTO appointmentDTO = new AppointmentDTO(CLIENT_ID, startTime, endTime, Arrays.asList(treatmentDTO));
 
-        appointmentService.create(appointmentDTO);
+        appointmentService.save(appointmentDTO);
 
         Appointment appointment = captor.getValue();
 
@@ -91,7 +95,7 @@ public class AppointmentServiceImplTest {
 
     @Test
     public void given_appointmentId_then_callDelete() {
-        String appointmentId = "123";
+        UUID appointmentId = UUID.randomUUID();
 
         this.appointmentService.deleteById(appointmentId);
 
@@ -100,7 +104,7 @@ public class AppointmentServiceImplTest {
 
     @Test
     public void given_appointmentId_then_call_repository_and_return_Appointment() {
-        String appointmentId = "123";
+        UUID appointmentId = UUID.randomUUID();
 
         Appointment appointment = mock(Appointment.class);
 

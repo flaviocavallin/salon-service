@@ -1,19 +1,22 @@
 package com.example.salon.domain;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-
 @Document(collection = "clients")
 @TypeAlias("client")
-public class Client extends AbstractDocument<String> {
+public class Client extends AbstractDocument<UUID> {
 
-    @Id
-    private String id;
+	private static final long serialVersionUID = -9059148646435022250L;
+
+	@Id
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
@@ -29,6 +32,7 @@ public class Client extends AbstractDocument<String> {
 
     public Client(String firstName, String lastName, String email, String phone, String gender) {
         this();
+        this.id = UUID.randomUUID();
         this.firstName = Objects.requireNonNull(firstName, "firstName can not be null");
         this.lastName = Objects.requireNonNull(lastName, "lastName can not be null");
         this.email = Objects.requireNonNull(email, "email can not be null");
@@ -36,17 +40,21 @@ public class Client extends AbstractDocument<String> {
         this.gender = Objects.requireNonNull(gender, "gender can not be null");
     }
 
-    public Client(String id, String firstName, String lastName, String email, String phone, String gender,
-                  boolean banned) {
+    public Client(UUID id, String firstName, String lastName, String email, String phone, String gender,
+                  Boolean banned) {
         this(firstName, lastName, email, phone, gender);
-        this.id = Objects.requireNonNull(id, "id can not be null");
-        this.banned = banned;
+        setId(id);
+        setBanned(banned);
     }
 
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return id;
+    }
+
+    private void setId(UUID id) {
+        this.id = id == null ? UUID.randomUUID() : id;
     }
 
     public String getFirstName() {
@@ -73,8 +81,9 @@ public class Client extends AbstractDocument<String> {
         return banned;
     }
 
-    public void setBanned(boolean banned) {
-        this.banned = banned;
+    public void setBanned(Boolean banned) {
+
+        this.banned = banned == null ? false : banned;
     }
 
     public void addLoyaltyPoints(LoyaltyPoint loyaltyPoint) {

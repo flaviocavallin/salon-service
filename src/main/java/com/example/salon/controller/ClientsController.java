@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/v1/clients", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -32,16 +33,16 @@ public class ClientsController {
     //TODO Add validations
     //TODO return client
     public void create(@RequestBody ClientDTO clientDTO) {
-        this.clientService.create(clientDTO);
+        this.clientService.save(clientDTO);
     }
 
     @GetMapping(value = "/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ClientDTO get(@PathVariable("clientId") String clientId) {
+    public ClientDTO get(@PathVariable("clientId") UUID clientId) {
         return this.clientService.getById(clientId);
     }
 
     @DeleteMapping(value = "/{clientId}")
-    public void delete(@PathVariable("clientId") String clientId) {
+    public void delete(@PathVariable("clientId") UUID clientId) {
         this.clientService.deleteById(clientId);
     }
 

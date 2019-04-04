@@ -33,7 +33,7 @@ class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
-    @ExceptionHandler({EntityCascadeDeletionNotAllowedException.class})
+    @ExceptionHandler({EntityCascadeDeletionNotAllowedException.class, IllegalArgumentException.class})
     public ResponseEntity<ApiError> notAllowed(EntityCascadeDeletionNotAllowedException ex) {
 
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, new Date(), ex.getMessage());

@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +37,9 @@ class ClientServiceImpl implements ClientService {
                 "null");
     }
 
+
     @Override
-    public void create(ClientDTO clientDTO) {
+    public void save(ClientDTO clientDTO) {
         Objects.requireNonNull(clientDTO, "clientDTO can not be null");
 
         Client client = clientDTOFactory.fromDTO(clientDTO);
@@ -46,7 +48,7 @@ class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ClientDTO getById(String clientId) {
+    public ClientDTO getById(UUID clientId) {
         Objects.requireNonNull(clientId, "clientId can not be null");
 
         Client client = clientRepository.findById(clientId).orElseThrow(() -> new EntityNotFoundException("The " +
@@ -56,7 +58,7 @@ class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void deleteById(String clientId) {
+    public void deleteById(UUID clientId) {
         Objects.requireNonNull(clientId, "clientId can not be null");
 
         if (this.appointmentRepository.existsByClient_Id(clientId)) {
@@ -73,14 +75,6 @@ class ClientServiceImpl implements ClientService {
 
         this.clientRepository.incrementLoyaltyPoints(loyaltyPointEvent.getClientId(), loyaltyPointEvent.getDate(),
                 loyaltyPointEvent.getPoints());
-    }
-
-    @Override
-    public void decrementClientLoyaltyPoints(LoyaltyPointEvent loyaltyPointEvent) {
-        Objects.requireNonNull(loyaltyPointEvent, "loyaltyPointEvent can not be null");
-
-        this.clientRepository.incrementLoyaltyPoints(loyaltyPointEvent.getClientId(), loyaltyPointEvent.getDate(),
-                -loyaltyPointEvent.getPoints());
     }
 
     @Override

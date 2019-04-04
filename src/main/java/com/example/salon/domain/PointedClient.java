@@ -4,10 +4,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class PointedClient {
 
-    private String id;
+    private UUID id;
     private String email;
     private long points;
 
@@ -15,13 +16,13 @@ public class PointedClient {
         //do nothing
     }
 
-    public PointedClient(String id, String email, long points) {
+    public PointedClient(UUID id, String email, long points) {
         this.id = Objects.requireNonNull(id, "id can not be null");
         this.email = Objects.requireNonNull(email, "email can not be null");
         this.points = points;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
@@ -112,7 +113,7 @@ public class ClientRepositoryImplTest {
 
     @Test
     public void given_clientId_And_client_has_loyaltyPoints_Then_increment_clientLoyaltyPoints() {
-        String clientId = client1.getId();
+        UUID clientId = client1.getId();
 
         Client c = clientRepository.findById(clientId).get();
 
@@ -138,7 +139,7 @@ public class ClientRepositoryImplTest {
 
     @Test
     public void given_client_Without_LoyaltyPoints_Then_assign_loyaltyPointToTheGivenDate() {
-        String clientId = client4.getId();
+        UUID clientId = client4.getId();
 
         Client c = clientRepository.findById(clientId).get();
 
@@ -146,6 +147,7 @@ public class ClientRepositoryImplTest {
 
         LocalDate date = LocalDate.of(2019, 1, 5);
         long points = 7;
+
         clientRepository.incrementLoyaltyPoints(clientId, date, points);
 
 

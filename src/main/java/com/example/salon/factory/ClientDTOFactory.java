@@ -16,8 +16,8 @@ public class ClientDTOFactory {
     public Client fromDTO(ClientDTO clientDTO) {
         Objects.requireNonNull(clientDTO, "clientDTO can not be null");
 
-        Client client = new Client(clientDTO.getFirstName(), clientDTO.getLastName(), clientDTO.getEmail(),
-                clientDTO.getPhone(), clientDTO.getGender());
+        Client client = new Client(clientDTO.getId(), clientDTO.getFirstName(), clientDTO.getLastName(), clientDTO.getEmail(),
+                clientDTO.getPhone(), clientDTO.getGender(),clientDTO.getBanned());
 
         return client;
     }
@@ -27,6 +27,7 @@ public class ClientDTOFactory {
 
         ClientDTO clientDTO = new ClientDTO(client.getFirstName(), client.getLastName(), client.getEmail(),
                 client.getPhone(), client.getGender());
+        clientDTO.setId(client.getId());
 
         return clientDTO;
     }

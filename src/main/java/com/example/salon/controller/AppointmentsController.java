@@ -1,6 +1,7 @@
 package com.example.salon.controller;
 
 import com.example.salon.dto.AppointmentDTO;
+import com.example.salon.dto.PurchaseDTO;
 import com.example.salon.service.AppointmentService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/v1/appointments", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -26,12 +28,17 @@ public class AppointmentsController {
     //TODO Add validations
     //TODO return appointment
     public void create(@RequestBody AppointmentDTO appointmentDTO) {
-        this.appointmentService.create(appointmentDTO);
+        this.appointmentService.save(appointmentDTO);
     }
 
 
     @DeleteMapping(value = "/{appointmentId}")
-    public void delete(@PathVariable("appointmentId") String appointmentId) {
+    public void delete(@PathVariable("appointmentId") UUID appointmentId) {
         this.appointmentService.deleteById(appointmentId);
+    }
+
+    @PostMapping("/purchase")
+    public void purchase(@RequestBody PurchaseDTO purchaseDTO) {
+        this.appointmentService.addPurchase(purchaseDTO);
     }
 }

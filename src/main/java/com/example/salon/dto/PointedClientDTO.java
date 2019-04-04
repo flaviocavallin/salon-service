@@ -1,9 +1,10 @@
 package com.example.salon.dto;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class PointedClientDTO {
-    private String id;
+    private UUID id;
     private String email;
     private long points;
 
@@ -11,13 +12,13 @@ public class PointedClientDTO {
         //do nothing
     }
 
-    public PointedClientDTO(String id, String email, long points) {
+    public PointedClientDTO(UUID id, String email, long points) {
         this.id = Objects.requireNonNull(id, "id can not be null");
         this.email = Objects.requireNonNull(email, "email can not be null");
         this.points = points;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

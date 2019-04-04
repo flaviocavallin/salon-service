@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -36,11 +37,9 @@ public class ClientServiceImplTest {
     private static final String EMAIL = "a1@a1.com";
     private static final String PHONE = "123";
     private static final String GENDER = "Male";
-
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    private UUID clientId = UUID.randomUUID();
     private ClientService clientService;
 
     private ClientRepository clientRepository = mock(ClientRepository.class);
@@ -62,7 +61,7 @@ public class ClientServiceImplTest {
 
         when(clientRepository.save(captor.capture())).thenReturn(any(Client.class));
 
-        this.clientService.create(clientDTO);
+        this.clientService.save(clientDTO);
 
         Client client = captor.getValue();
         Assertions.assertThat(client.getFirstName()).isEqualTo(FIRST_NAME);
@@ -77,7 +76,6 @@ public class ClientServiceImplTest {
 
     @Test
     public void givenClientId_then_findClient_And_ReturnClientDTO() {
-        String clientId = "123";
 
         Client client = new Client(FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER);
 
@@ -97,7 +95,6 @@ public class ClientServiceImplTest {
 
     @Test
     public void givenClientId_then_findClient_then_ThrowExceptionBecauseClientNotFound() {
-        String clientId = "123";
         String exceptionMessage = "ClientId not found";
         when(clientRepository.findById(clientId)).thenThrow(new EntityNotFoundException(exceptionMessage));
 
@@ -112,9 +109,7 @@ public class ClientServiceImplTest {
 
     @Test
     public void givenClientId_then_DeleteClienteById() {
-        String clientId = "123";
-
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
         doNothing().when(clientRepository).deleteById(captor.capture());
         when(appointmentRepository.existsByClient_Id(clientId)).thenReturn(Boolean.FALSE);
@@ -130,8 +125,6 @@ public class ClientServiceImplTest {
 
     @Test
     public void given_ClientId_then_tryToDeleteTheClient_And_ThrowExceptionBecauseItHasAReferenceToAppointment() {
-        String clientId = "123";
-
         thrown.expect(EntityCascadeDeletionNotAllowedException.class);
         thrown.expectMessage("Impossible to delete the client because there are appointments");
 
@@ -145,7 +138,7 @@ public class ClientServiceImplTest {
 
     @Test
     public void give_LoyalClients_then_return_PointedClientDTO() {
-        String id = "123";
+        UUID id = UUID.randomUUID();
         String email = "a1@a1.com";
         long points = 100;
 
@@ -173,26 +166,14 @@ public class ClientServiceImplTest {
 
     @Test
     public void given_LoyaltyPointEvent_then_call_incrementLoyaltyPoints() {
-        String clientId = "123";
+        UUID clientId = UUID.randomUUID();
         LocalDate date = LocalDate.of(2019, 1, 1);
         long points = 10;
 
-        LoyaltyPointEvent loyaltyPointEvent = new LoyaltyPointEvent(clientId, date, points);
+        LoyaltyPointEvent loyaltyPointEvent = new LoyaltyPointEvent(this, clientId, date, points);
         this.clientService.incrementClientLoyaltyPoints(loyaltyPointEvent);
 
         verify(clientRepository).incrementLoyaltyPoints(clientId, date, points);
     }
 
-
-    @Test
-    public void given_LoyaltyPointEvent_then_call_decrementLoyaltyPoints() {
-        String clientId = "123";
-        LocalDate date = LocalDate.of(2019, 1, 1);
-        long points = 10;
-
-        LoyaltyPointEvent loyaltyPointEvent = new LoyaltyPointEvent(clientId, date, points);
-        this.clientService.decrementClientLoyaltyPoints(loyaltyPointEvent);
-
-        verify(clientRepository).incrementLoyaltyPoints(clientId, date, -points);
-    }
 }

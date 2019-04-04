@@ -5,7 +5,9 @@ import com.example.salon.domain.Client;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
-public interface AppointmentRepository extends MongoRepository<Appointment, String> {
-    boolean existsByClient_Id(String clientId);
+public interface AppointmentRepository extends MongoRepository<Appointment, UUID>, CustomAppointmentRepository {
+    boolean existsByClient_Id(UUID clientId);
 }

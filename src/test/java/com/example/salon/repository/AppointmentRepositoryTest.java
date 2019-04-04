@@ -14,6 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -130,7 +131,7 @@ public class AppointmentRepositoryTest {
 
 
     @Test
-    public void given_Appointment_then_findByClientId(){
+    public void given_Appointment_then_findByClientId() {
         Date startTime = new Date();
         Date endTime = new Date();
 

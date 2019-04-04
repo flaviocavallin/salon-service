@@ -5,21 +5,21 @@ import com.example.salon.domain.Client;
 import com.example.salon.domain.Purchase;
 import com.example.salon.domain.Treatment;
 import com.example.salon.listeners.LoyaltyPointEvent;
+import com.example.salon.util.DateUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.UUID;
 
 public class LoyaltyPointEventFactoryTest {
 
     private LoyaltyPointEventFactory factory;
 
     private Appointment appointment;
-    private String clientId = "1";
+    private UUID clientId = UUID.randomUUID();
 
     private String treatmentName = "Pedicure";
     private double treatmentPrice = 40;
@@ -43,7 +43,7 @@ public class LoyaltyPointEventFactoryTest {
 
         Client client = new Client(firstName, lastName, email, phone, gender) {
             @Override
-            public String getId() {
+            public UUID getId() {
                 return clientId;
             }
         };
@@ -64,15 +64,8 @@ public class LoyaltyPointEventFactoryTest {
         LoyaltyPointEvent loyaltyPointEvent = this.factory.convert(appointment);
 
         Assertions.assertThat(loyaltyPointEvent.getClientId()).isEqualTo(clientId);
-        Assertions.assertThat(loyaltyPointEvent.getDate()).isEqualTo(convertToLocalDateViaInstant(startTime));
+        Assertions.assertThat(loyaltyPointEvent.getDate()).isEqualTo(DateUtil.convertToLocaDate(startTime));
         Assertions.assertThat(loyaltyPointEvent.getPoints()).isEqualTo(treatmentLoyaltyPoints + purchaseLoyaltyPoints);
-    }
-
-
-    private LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
     }
 
 }

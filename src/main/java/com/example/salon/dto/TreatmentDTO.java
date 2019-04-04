@@ -1,9 +1,15 @@
 package com.example.salon.dto;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import java.util.Objects;
+import java.util.UUID;
 
 public class TreatmentDTO {
 
+    private UUID id;
+    private UUID appointmentId;
     private String name;
     private double price;
     private long loyaltyPoints;
@@ -18,6 +24,22 @@ public class TreatmentDTO {
         this.loyaltyPoints = loyaltyPoints;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(UUID appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
     public String getName() {
         return name;
     }
@@ -28,5 +50,11 @@ public class TreatmentDTO {
 
     public long getLoyaltyPoints() {
         return loyaltyPoints;
+    }
+
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 }

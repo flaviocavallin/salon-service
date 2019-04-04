@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class LoyaltyPoint extends AbstractDocument<LocalDate> {
-    private LocalDate date;
+
+	private static final long serialVersionUID = -8084659654368252200L;
+	private LocalDate date;
     private long points;
 
     LoyaltyPoint() {

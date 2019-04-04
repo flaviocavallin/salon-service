@@ -1,22 +1,27 @@
 package com.example.salon.domain;
 
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-
-@Document(collection = "appointments")
+@Document(collection = Appointment.COLLECTION_NAME)
 @TypeAlias("appointment")
-public class Appointment extends AbstractDocument<String> {
+public class Appointment extends AbstractDocument<UUID> {
+
+	private static final long serialVersionUID = -7199261031041360470L;
+
+	public static final String COLLECTION_NAME = "appointments";
 
     @Id
-    private String id;
+    private UUID id;
 
     @DBRef(lazy = true)
     private Client client;
@@ -32,8 +37,14 @@ public class Appointment extends AbstractDocument<String> {
         //do nothing
     }
 
+    public Appointment(UUID id, Client client, Date startTime, Date endTime, List<Treatment> treatments) {
+        this(client, startTime, endTime, treatments);
+        setId(id);
+    }
+
     public Appointment(Client client, Date startTime, Date endTime, List<Treatment> treatments) {
         this();
+        this.id = UUID.randomUUID();
         this.client = Objects.requireNonNull(client, "client can not be null");
         this.startTime = Objects.requireNonNull(startTime, "startTime can not be null");
         this.endTime = Objects.requireNonNull(endTime, "endTime can not be null");
@@ -41,12 +52,12 @@ public class Appointment extends AbstractDocument<String> {
     }
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    protected void setId(String appointmentId){
-        this.id = appointmentId;
+    protected void setId(UUID id) {
+        this.id = id == null ? UUID.randomUUID() : id;
     }
 
     public Client getClient() {
@@ -66,7 +77,7 @@ public class Appointment extends AbstractDocument<String> {
         purchases.add(purchase);
     }
 
-    public void addAllPurchases(List<Purchase> purchases){
+    public void addAllPurchases(List<Purchase> purchases) {
         Objects.requireNonNull(purchases, "purchases can not be null");
         this.purchases.addAll(purchases);
     }

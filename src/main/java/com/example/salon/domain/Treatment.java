@@ -1,12 +1,12 @@
 package com.example.salon.domain;
 
-import org.bson.types.ObjectId;
-
 import java.util.Objects;
+import java.util.UUID;
 
-public class Treatment extends AbstractDocument<String> {
+public class Treatment extends AbstractDocument<UUID> {
 
-    private String id;
+	private static final long serialVersionUID = -8470976381761924281L;
+	private UUID id;
     private String name;
     private double price;
     private long loyaltyPoints;
@@ -15,9 +15,14 @@ public class Treatment extends AbstractDocument<String> {
         //do nothing
     }
 
+    public Treatment(UUID id, String name, double price, long loyaltyPoints) {
+        this(name, price, loyaltyPoints);
+        this.id = id;
+    }
+
     public Treatment(String name, double price, long loyaltyPoints) {
         this();
-        this.id = ObjectId.get().toString();
+        this.id = UUID.randomUUID();
         this.name = Objects.requireNonNull(name, "name can not be null");
         this.price = price;
         this.loyaltyPoints = loyaltyPoints;
@@ -25,8 +30,12 @@ public class Treatment extends AbstractDocument<String> {
 
 
     @Override
-    public String getId() {
+    public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getName() {

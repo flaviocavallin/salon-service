@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
@@ -79,7 +80,7 @@ class ClientRepositoryImpl implements CustomClientRepository {
     }
 
     @Override
-    public void incrementLoyaltyPoints(String clientId, LocalDate date, long points) {
+    public void incrementLoyaltyPoints(UUID clientId, LocalDate date, long points) {
         Objects.requireNonNull(clientId, "clientId can not be null");
         Objects.requireNonNull(date, "date can not be null");
 

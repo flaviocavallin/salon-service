@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -35,11 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = SalonApplication.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 public class ClientsControllerTest {
 
-    private static final String CLIENT_ID = "123";
+    private static final UUID CLIENT_ID = UUID.randomUUID();
 
     private static final String FIRST_NAME = "name1";
     private static final String LAST_NAME = "lastName1";
@@ -63,7 +64,7 @@ public class ClientsControllerTest {
 
         ArgumentCaptor<ClientDTO> captor = ArgumentCaptor.forClass(ClientDTO.class);
 
-        Mockito.doNothing().when(clientService).create(captor.capture());
+        Mockito.doNothing().when(clientService).save(captor.capture());
 
         mvc.perform(post("/api/v1/clients").content(content)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -78,7 +79,7 @@ public class ClientsControllerTest {
         Assertions.assertThat(clientDTO.getPhone()).isEqualTo(PHONE);
         Assertions.assertThat(clientDTO.getGender()).isEqualTo(GENDER);
 
-        Mockito.verify(clientService).create(clientDTO);
+        Mockito.verify(clientService).save(clientDTO);
     }
 
 
@@ -120,7 +121,7 @@ public class ClientsControllerTest {
     @Test
     public void given_ClientId_then_deleteClientById() throws Exception {
 
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
         Mockito.doNothing().when(clientService).deleteById(captor.capture());
 
@@ -155,7 +156,7 @@ public class ClientsControllerTest {
         int limit = 10;
         LocalDate dateFrom = LocalDate.of(2019, 1, 1);
 
-        String id = "1";
+        UUID id = UUID.randomUUID();
         String email = "a1@a1.com";
         Long points = 10l;
 
@@ -165,7 +166,7 @@ public class ClientsControllerTest {
 
         mvc.perform(get("/api/v1/clients/top/{limit}/loyal", limit).param("dateFrom", dateFrom.toString()).contentType(MediaType.APPLICATION_JSON_VALUE).accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$[0].id", is(id)))
+                .andExpect(jsonPath("$[0].id", is(id.toString())))
                 .andExpect(jsonPath("$[0].email", is(email)))
                 .andExpect(jsonPath("$[0].points", is(points.intValue())))
                 .andDo(print());

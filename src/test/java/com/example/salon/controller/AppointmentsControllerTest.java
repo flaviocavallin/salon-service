@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,11 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = SalonApplication.class)
+@SpringBootTest
 @AutoConfigureMockMvc
 public class AppointmentsControllerTest {
 
-    private static final String CLIENT_ID = "5c9fd8360884791e7e28978b";
+    private static final UUID CLIENT_ID = UUID.randomUUID();
     private static final Date START_TIME;
     private static final Date END_TIME;
     private static final String TREATMENT_NAME = "Full Head Colour";
@@ -58,8 +59,10 @@ public class AppointmentsControllerTest {
 
     @MockBean
     private AppointmentService appointmentService;
+
     @Autowired
     private MockMvc mvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -80,7 +83,7 @@ public class AppointmentsControllerTest {
 
         ArgumentCaptor<AppointmentDTO> captor = ArgumentCaptor.forClass(AppointmentDTO.class);
 
-        Mockito.doNothing().when(appointmentService).create(captor.capture());
+        Mockito.doNothing().when(appointmentService).save(captor.capture());
 
         mvc.perform(post("/api/v1/appointments").content(content)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -111,15 +114,15 @@ public class AppointmentsControllerTest {
         Assertions.assertThat(p.getPrice()).isEqualTo(purchasePrice);
         Assertions.assertThat(p.getLoyaltyPoints()).isEqualTo(purchaseLoyaltyPoints);
 
-        Mockito.verify(appointmentService).create(appointmentDTO);
+        Mockito.verify(appointmentService).save(appointmentDTO);
     }
 
 
     @Test
     public void given_appointmentId_then_delete() throws Exception {
-        String appointmentId = "123";
+        UUID appointmentId = UUID.randomUUID();
 
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
         Mockito.doNothing().when(appointmentService).deleteById(captor.capture());
 
@@ -131,6 +134,39 @@ public class AppointmentsControllerTest {
         Assertions.assertThat(captor.getValue()).isEqualTo(appointmentId);
 
         Mockito.verify(appointmentService).deleteById(appointmentId);
+    }
+
+
+    @Test
+    public void given_AppointmentID_and_PurchaseDTO_then_Register_Purchase() throws Exception {
+        UUID appointmentId = UUID.randomUUID();
+        String purchaseName = "Shampoo";
+        double purchasePrice = 10;
+        long purchaseLoyaltyPoints = 20;
+
+        PurchaseDTO dto = new PurchaseDTO(purchaseName, purchasePrice, purchaseLoyaltyPoints);
+        dto.setAppointmentId(appointmentId);
+
+        String content = objectMapper.writeValueAsString(dto);
+
+        ArgumentCaptor<PurchaseDTO> purchaseCaptor = ArgumentCaptor.forClass(PurchaseDTO.class);
+
+        Mockito.doNothing().when(appointmentService).addPurchase(purchaseCaptor.capture());
+
+        mvc.perform(post("/api/v1/appointments/purchase", appointmentId).content(content)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        PurchaseDTO purchaseDTO = purchaseCaptor.getValue();
+
+        Assertions.assertThat(purchaseDTO.getAppointmentId()).isEqualTo(appointmentId);
+        Assertions.assertThat(purchaseDTO.getName()).isEqualTo(purchaseName);
+        Assertions.assertThat(purchaseDTO.getPrice()).isEqualTo(purchasePrice);
+        Assertions.assertThat(purchaseDTO.getLoyaltyPoints()).isEqualTo(purchaseLoyaltyPoints);
+
+
+        Mockito.verify(appointmentService).addPurchase(purchaseDTO);
     }
 
 }
