@@ -103,4 +103,13 @@ class ClientRepositoryImpl implements CustomClientRepository {
         }
     }
 
+    @Override
+    public void updateBanAttributeByClientId(UUID clientId, boolean banned) {
+        Objects.requireNonNull(clientId, "clientId can not be null");
+
+        Query query = new Query().addCriteria(Criteria.where("_id").is(clientId));
+
+        mongoTemplate.updateFirst(query, Update.update("banned", banned), Client.class);
+    }
+
 }

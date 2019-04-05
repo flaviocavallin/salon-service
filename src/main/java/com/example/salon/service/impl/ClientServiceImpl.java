@@ -93,5 +93,10 @@ class ClientServiceImpl implements ClientService {
         return pointedClients.stream().map(p -> new PointedClientDTO(p.getId(), p.getEmail(), p.getPoints())).collect(Collectors.toList());
     }
 
+    @Override
+    public void banClient(UUID clientId) {
+        Objects.requireNonNull(clientId, "clientId can not be null");
 
+        clientRepository.updateBanAttributeByClientId(clientId, true);
+    }
 }

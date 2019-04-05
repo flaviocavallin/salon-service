@@ -19,4 +19,6 @@ public interface ClientService {
     void incrementClientLoyaltyPoints(LoyaltyPointEvent loyaltyPointEvent);
 
     List<PointedClientDTO> getTopMostLoyalActiveClientsBy(LocalDate dateFrom, LocalDate dateTo, int limit);
+
+    void banClient(UUID clientId);
 }

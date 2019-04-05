@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -162,7 +163,6 @@ public class ClientsControllerTest {
 
     @Test
     public void given_limit_and_dateFrom_then_getTopLoyalClients() throws Exception {
-
         int limit = 10;
         LocalDate dateFrom = LocalDate.of(2019, 1, 1);
 
@@ -184,4 +184,21 @@ public class ClientsControllerTest {
         Mockito.verify(clientService).getTopMostLoyalActiveClientsBy(dateFrom, LocalDate.now(), limit);
     }
 
+
+    @Test
+    public void given_ClientId_then_banIt() throws Exception {
+
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
+
+        Mockito.doNothing().when(clientService).banClient(captor.capture());
+
+        mvc.perform(patch("/api/v1/clients/{clientId}/ban", CLIENT_ID)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(captor.getValue()).isEqualTo(CLIENT_ID);
+
+        Mockito.verify(clientService).banClient(CLIENT_ID);
+    }
 }
