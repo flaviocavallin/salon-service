@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ClientService {
 
-    void save(ClientDTO clientDTO);
+    ClientDTO save(ClientDTO clientDTO);
 
     ClientDTO getById(UUID clientId);
 
@@ -19,4 +19,6 @@ public interface ClientService {
     void incrementClientLoyaltyPoints(LoyaltyPointEvent loyaltyPointEvent);
 
     List<PointedClientDTO> getTopMostLoyalActiveClientsBy(LocalDate dateFrom, LocalDate dateTo, int limit);
+
+    void banClient(UUID clientId);
 }

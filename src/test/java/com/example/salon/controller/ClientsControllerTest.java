@@ -1,6 +1,5 @@
 package com.example.salon.controller;
 
-import com.example.salon.SalonApplication;
 import com.example.salon.dto.ClientDTO;
 import com.example.salon.dto.PointedClientDTO;
 import com.example.salon.exceptions.EntityCascadeDeletionNotAllowedException;
@@ -29,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,6 +47,7 @@ public class ClientsControllerTest {
     private static final String EMAIL = "a1@a1.com";
     private static final String PHONE = "123";
     private static final String GENDER = "Male";
+    private static final Boolean BANNED = Boolean.FALSE;
 
     @MockBean
     private ClientService clientService;
@@ -64,11 +65,21 @@ public class ClientsControllerTest {
 
         ArgumentCaptor<ClientDTO> captor = ArgumentCaptor.forClass(ClientDTO.class);
 
-        Mockito.doNothing().when(clientService).save(captor.capture());
+        ClientDTO savedClientDTO = new ClientDTO(CLIENT_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER);
+        savedClientDTO.setBanned(BANNED);
+
+        Mockito.when(clientService.save(captor.capture())).thenReturn(savedClientDTO);
 
         mvc.perform(post("/api/v1/clients").content(content)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(CLIENT_ID.toString())))
+                .andExpect(jsonPath("$.firstName", is(FIRST_NAME)))
+                .andExpect(jsonPath("$.lastName", is(LAST_NAME)))
+                .andExpect(jsonPath("$.email", is(EMAIL)))
+                .andExpect(jsonPath("$.phone", is(PHONE)))
+                .andExpect(jsonPath("$.gender", is(GENDER)))
+                .andExpect(jsonPath("$.banned", is(BANNED)))
                 .andDo(print());
 
         ClientDTO clientDTO = captor.getValue();
@@ -152,7 +163,6 @@ public class ClientsControllerTest {
 
     @Test
     public void given_limit_and_dateFrom_then_getTopLoyalClients() throws Exception {
-
         int limit = 10;
         LocalDate dateFrom = LocalDate.of(2019, 1, 1);
 
@@ -174,4 +184,21 @@ public class ClientsControllerTest {
         Mockito.verify(clientService).getTopMostLoyalActiveClientsBy(dateFrom, LocalDate.now(), limit);
     }
 
+
+    @Test
+    public void given_ClientId_then_banIt() throws Exception {
+
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
+
+        Mockito.doNothing().when(clientService).banClient(captor.capture());
+
+        mvc.perform(patch("/api/v1/clients/{clientId}/ban", CLIENT_ID)
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(captor.getValue()).isEqualTo(CLIENT_ID);
+
+        Mockito.verify(clientService).banClient(CLIENT_ID);
+    }
 }

@@ -3,6 +3,8 @@ package com.example.salon.dto;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import java.util.UUID;
 
 public class ClientDTO {
@@ -10,7 +12,10 @@ public class ClientDTO {
     private UUID id;
     private String firstName;
     private String lastName;
+
+    @Email
     private String email;
+
     private String phone;
     private String gender;
     private Boolean banned;

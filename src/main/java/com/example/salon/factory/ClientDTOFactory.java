@@ -28,6 +28,7 @@ public class ClientDTOFactory {
         ClientDTO clientDTO = new ClientDTO(client.getFirstName(), client.getLastName(), client.getEmail(),
                 client.getPhone(), client.getGender());
         clientDTO.setId(client.getId());
+        clientDTO.setBanned(client.isBanned());
 
         return clientDTO;
     }

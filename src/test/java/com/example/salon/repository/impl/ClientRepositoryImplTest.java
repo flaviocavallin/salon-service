@@ -161,4 +161,19 @@ public class ClientRepositoryImplTest {
         Assertions.assertThat(loyaltyPoint.getDate()).isEqualTo(date);
         Assertions.assertThat(loyaltyPoint.getPoints()).isEqualTo(points);
     }
+
+
+    @Test
+    public void given_client_then_banIt(){
+        UUID clientId = client1.getId();
+        Client c = clientRepository.findById(clientId).get();
+
+        Assertions.assertThat(c.isBanned()).isFalse();
+
+        clientRepository.updateBanAttributeByClientId(clientId, true);
+
+        c = clientRepository.findById(clientId).get();
+
+        Assertions.assertThat(c.isBanned()).isTrue();
+    }
 }

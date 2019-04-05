@@ -1,0 +1,318 @@
+{
+	"info": {
+		"_postman_id": "2b58cb7d-ead4-4bec-ac8e-ef650f516735",
+		"name": "salon",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Client",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"firstName\": \"name1\", \"lastName\": \"lastName1\", \"email\": \"a1@a1.com\",  \"phone\": \"phone1\", \"gender\": \"Male\"}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/clients",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Client",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/clients/e53355ee-f55c-488d-ad30-085651796635",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"clients",
+						"e53355ee-f55c-488d-ad30-085651796635"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Top Loyal Clients",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/clients/5ca1138f1c485624b575d4c9",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"clients",
+						"5ca1138f1c485624b575d4c9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Client",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/clients/5c9fd8360884791e7e28978b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"clients",
+						"5c9fd8360884791e7e28978b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Appointment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"clientId\": \"4d916ca9-9bcb-486d-92e8-1dd771af4bdf\", \n \"startTime\": \"2016-04-02 12:45:00 +0100\", \n \"endTime\": \"2016-04-02 13:45:00 +0100\",\n \"treatments\":[\n \t\t{\"name\": \"Full Head Colour1111\", \"price\":85.0, \"loyaltyPoints\":1}\n \t],\n \"purchases\":[\n \t\t{\"name\": \"Shampoo11111\", \"price\":19.5, \"loyaltyPoints\":2}\n \t]\n\n\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/appointments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Appointment",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/appointments/5ca1950c1c48566f0ac1756e",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"appointments",
+						"5ca1950c1c48566f0ac1756e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ban Client",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/clients/e53355ee-f55c-488d-ad30-085651796635/ban",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"clients",
+						"e53355ee-f55c-488d-ad30-085651796635",
+						"ban"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Purchase",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"Shampoo\", \"price\":19.5, \"loyaltyPoints\":20}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/appointments/5ca114111c485624b575d4ca/purchase",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"appointments",
+						"5ca114111c485624b575d4ca",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload File",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/salon-service/api/v1/files",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"salon-service",
+						"api",
+						"v1",
+						"files"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,39 @@
+version: '2.0'
+
+services:
+  my-mongodb:
+    image: mongo
+    container_name: my-mongodb
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    networks:
+      - mongo_net
+
+  app:
+    build: .
+    container_name: app
+    image: app
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - MONGO_INITDB_DATABASE=test
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - spring.data.mongodb.uri=mongodb://mongoadmin:secret@my-mongodb:27017/test?authSource=admin&authMechanism=SCRAM-SHA-1
+    ports:
+      - 8080:8080
+    networks:
+      - mongo_net
+    depends_on:
+      - my-mongodb
+
+
+
+networks:
+  mongo_net:
+    driver: bridge
+  

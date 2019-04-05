@@ -12,4 +12,6 @@ public interface CustomClientRepository {
 
     void incrementLoyaltyPoints(UUID clientId, LocalDate date, long points);
 
+    void updateBanAttributeByClientId(UUID clientId, boolean banned);
+
 }
