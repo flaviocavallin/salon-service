@@ -17,6 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -54,23 +55,22 @@ public class ClientServiceImplTest {
 
     @Test
     public void givenClientDTO_then_createClientAndSaveItTest() {
-
         ClientDTO clientDTO = new ClientDTO(FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER);
 
-        ArgumentCaptor<Client> captor = ArgumentCaptor.forClass(Client.class);
+        Client client = new Client(UUID.randomUUID(), FIRST_NAME, LAST_NAME, EMAIL, PHONE, GENDER, Boolean.FALSE);
 
-        when(clientRepository.save(captor.capture())).thenReturn(any(Client.class));
+        when(clientRepository.save(Mockito.any(Client.class))).thenReturn(client);
 
-        this.clientService.save(clientDTO);
+        ClientDTO savedClientDTO = this.clientService.save(clientDTO);
 
-        Client client = captor.getValue();
-        Assertions.assertThat(client.getFirstName()).isEqualTo(FIRST_NAME);
-        Assertions.assertThat(client.getLastName()).isEqualTo(LAST_NAME);
-        Assertions.assertThat(client.getEmail()).isEqualTo(EMAIL);
-        Assertions.assertThat(client.getPhone()).isEqualTo(PHONE);
-        Assertions.assertThat(client.getGender()).isEqualTo(GENDER);
+        Assertions.assertThat(savedClientDTO.getFirstName()).isEqualTo(FIRST_NAME);
+        Assertions.assertThat(savedClientDTO.getLastName()).isEqualTo(LAST_NAME);
+        Assertions.assertThat(savedClientDTO.getEmail()).isEqualTo(EMAIL);
+        Assertions.assertThat(savedClientDTO.getPhone()).isEqualTo(PHONE);
+        Assertions.assertThat(savedClientDTO.getGender()).isEqualTo(GENDER);
+        Assertions.assertThat(savedClientDTO.getBanned()).isEqualTo(Boolean.FALSE);
 
-        verify(clientRepository).save(client);
+        verify(clientRepository).save(Mockito.any(Client.class));
     }
 
 

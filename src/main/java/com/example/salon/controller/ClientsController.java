@@ -31,9 +31,8 @@ public class ClientsController {
 
     @PostMapping
     //TODO Add validations
-    //TODO return client
-    public void create(@RequestBody ClientDTO clientDTO) {
-        this.clientService.save(clientDTO);
+    public ClientDTO create(@RequestBody ClientDTO clientDTO) {
+        return this.clientService.save(clientDTO);
     }
 
     @GetMapping(value = "/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)

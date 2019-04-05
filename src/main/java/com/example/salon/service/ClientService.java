@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ClientService {
 
-    void save(ClientDTO clientDTO);
+    ClientDTO save(ClientDTO clientDTO);
 
     ClientDTO getById(UUID clientId);
 

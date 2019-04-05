@@ -39,12 +39,14 @@ class ClientServiceImpl implements ClientService {
 
 
     @Override
-    public void save(ClientDTO clientDTO) {
+    public ClientDTO save(ClientDTO clientDTO) {
         Objects.requireNonNull(clientDTO, "clientDTO can not be null");
 
         Client client = clientDTOFactory.fromDTO(clientDTO);
 
-        clientRepository.save(client);
+        client = clientRepository.save(client);
+
+        return clientDTOFactory.toDTO(client);
     }
 
     @Override
