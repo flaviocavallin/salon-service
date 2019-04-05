@@ -4,6 +4,7 @@ import com.example.salon.dto.AppointmentDTO;
 import com.example.salon.dto.PurchaseDTO;
 import com.example.salon.service.AppointmentService;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @RestController
+@Validated
 @RequestMapping(value = "/api/v1/appointments", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AppointmentsController {
 

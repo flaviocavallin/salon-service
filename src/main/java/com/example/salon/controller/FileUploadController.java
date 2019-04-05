@@ -2,6 +2,7 @@ package com.example.salon.controller;
 
 import com.example.salon.domain.FileType;
 import com.example.salon.service.StorageService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

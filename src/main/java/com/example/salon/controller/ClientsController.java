@@ -5,6 +5,7 @@ import com.example.salon.dto.PointedClientDTO;
 import com.example.salon.service.ClientService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @RestController
+@Validated
 @RequestMapping(value = "/api/v1/clients", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class ClientsController {
 
@@ -32,7 +35,7 @@ public class ClientsController {
 
     @PostMapping
     //TODO Add validations
-    public ClientDTO create(@RequestBody ClientDTO clientDTO) {
+    public ClientDTO create(@Valid @RequestBody ClientDTO clientDTO) {
         return this.clientService.save(clientDTO);
     }
 
@@ -55,7 +58,6 @@ public class ClientsController {
 
         return this.clientService.getTopMostLoyalActiveClientsBy(dateFrom, LocalDate.now(), limit);
     }
-
 
     @PatchMapping("/{clientId}/ban")
     public void banClient(@PathVariable("clientId") UUID clientId) {
